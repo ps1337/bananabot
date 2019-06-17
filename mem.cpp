@@ -65,3 +65,55 @@ bool Mem::writemem(void *address, void *buf, size_t size)
 
     return (bytes_count_write == (ssize_t)size);
 }
+
+
+uint64_t Mem::addr_from_ptr(uint64_t ptr)
+{
+    unsigned char buffer[8];
+    if (!Mem::readmem((void *)ptr, buffer, sizeof(buffer)))
+    {
+        std::cerr << "Couldn't read from " << std::hex << ptr << std::endl;
+        exit(1);
+    }
+    ptr = *(uint64_t *)(&buffer);
+    return ptr;
+}
+
+uint64_t Mem::addr_from_multilvl_ptr(uint64_t ptr, std::vector<unsigned int> offsets)
+{
+    unsigned char buffer[8];
+    for (int i = 0; i < offsets.size(); i++)
+    {
+        ptr += offsets[i];
+        if (!Mem::readmem((void *)ptr, buffer, sizeof(buffer)))
+        {
+            std::cerr << "Couldn't read from " << std::hex << ptr << std::endl;
+            exit(1);
+        }
+        // don't dereference in last round
+        if (i == offsets.size() - 1)
+        {
+            return ptr;
+        }
+        // dereference where buffer points to
+        ptr = *(uint64_t *)(&buffer);
+    }
+    return ptr;
+}
+
+std::vector<unsigned char> Mem::readFromAddr(void *address, size_t size)
+{
+    unsigned char buffer[size] = {0};
+    if (!Mem::readmem(address, buffer, size))
+    {
+        std::cerr << "Couldn't read from " << std::hex << address << std::endl;
+        exit(1);
+    }
+    std::vector<unsigned char> res(buffer, buffer + size);
+    return res;
+}
+
+bool Mem::writeToAddr(void *address, std::vector<unsigned char> buffer)
+{
+    return Mem::writemem(address, reinterpret_cast<unsigned char *>(buffer.data()), buffer.size());
+}
