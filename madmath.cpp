@@ -7,11 +7,14 @@ float MadMath::get3DDistance(float own_x, float own_y, float own_z, float entity
 
 std::vector<float> MadMath::calcAngle(std::vector<float> src, std::vector<float> dst) {
     std::vector<float> angles;
-    std::vector<float> delta = { src[0] - dst[0], src[1] - dst[1], src[2] - dst[2] };
-    float hyp = std::sqrt(delta[0] * delta[0] + delta[1] * delta[1]);
-
-    angles.push_back(asinf(delta[2] / hyp) * RADIANT);
-    angles.push_back(atanf(delta[1] / delta[0]) * RADIANT);
+    std::vector<double> delta = { src[0] - dst[0], src[1] - dst[1], src[2] - dst[2] };
+    double hyp = std::sqrt(delta[0] * delta[0] + delta[2] * delta[2]);
+/* 
+    auto tmp1 = (float)delta[2] / hyp;
+    auto tmp2 = (float)asinf(delta[2] / hyp);
+    auto tmp3 = (float)asinf(delta[2] / hyp) * RADIANT; */
+    angles.push_back((float) (asinf(delta[1]/hyp) * 57.295779513082f));
+    angles.push_back((float) (atanf(delta[2]/delta[0]) * 57.295779513082f));
     angles.push_back(0);
 
     if(delta[0] >= 0) {

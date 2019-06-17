@@ -61,14 +61,13 @@ unsigned int entity_m_vec_origin_y_offset = entity_m_vec_origin_start;
 unsigned int entity_m_vec_origin_x_offset = entity_m_vec_origin_start + 0x04;
 
 std::vector<float> own_location = {-1, -1, -1};
-PlayerInfo_t nearestEnemy(0,0,{0}, 0);
-
+PlayerInfo_t nearestEnemy(0, 0, {0}, 0);
 
 pid_t PID;
 
 int main()
 {
-    std::cout << "CSO:GO 1337 BANANABOT STARTING" << std::endl;
+    std::cout << "*PENG PENG* CS:GO 1337 BANANABOT STARTING" << std::endl;
 
     PID = Util::getPID();
     std::cout << "CSGO Process PID: " << PID << std::endl;
@@ -82,20 +81,35 @@ int main()
     while (true)
     {
         own_location = Game::getPlayerLocation();
+        if (aimbot)
+        {
+            // this also sets `nearestEnemy`
+            auto enemies = Game::getEnemies();
+            if (nearestEnemy.distance != 0.0)
+            {
+                auto angle = MadMath::calcAngle(own_location, nearestEnemy.location);
+                //std::cout << "Aiming @ " << angle[1] << "/" << angle[0] << " (" << nearestEnemy.location[0] << "/" << nearestEnemy.location[1] << "/" << nearestEnemy.location[2] << ")" << std::endl;
+                //std::cout << "Own location: " << own_location[0] << "/" << own_location[1] << "/" << own_location[2] << std::endl << std::endl;
+                if(! (std::isnan(angle[0]) || std::isnan(angle[1]))) {
+                    if (!Game::setAngle(angle[1], angle[0]))
+                    {
+                        std::cerr << "Couldn't set angle to " << angle[1] << "/" << angle[0] << std::endl;
+                    }
+                }
+                else {
+                    std::cerr << "WARNING: Angle IsNAN" << std::endl;
+                }
+            }
+        }
 
         if (bunnyhop && Mem::readFromAddr((void *)player_is_on_floor_addr, 1)[0] == 1)
         {
             Mem::writeToAddr((void *)force_jump_addr, {0x06});
         }
 
-        if (noflash) {
+        if (noflash)
+        {
             Mem::writeToAddr((void *)player_flash_time_addr, {0, 0, 0, 0, 0, 0, 0, 0});
-        }
-
-        if(aimbot) {
-            auto enemies = Game::getEnemies();
-            auto tst = nearestEnemy;
-            int a = 2;
         }
 
         usleep(200);

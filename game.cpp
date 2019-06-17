@@ -134,3 +134,15 @@ std::vector<PlayerInfo_t> Game::getEnemies()
     }
     return res;
 }
+
+bool Game::setAngle(float x, float y)
+{
+    std::vector<unsigned char> x_buf(sizeof(x));
+    std::vector<unsigned char> y_buf(sizeof(y));
+    std::memcpy(x_buf.data(), &x, sizeof(x));
+    std::memcpy(y_buf.data(), &y, sizeof(y));
+    // TODO swapped
+    auto write_x = Mem::writeToAddr((void *)client_state_view_angle_x_addr, y_buf);
+    auto write_y = Mem::writeToAddr((void *)client_state_view_angle_y_addr, x_buf);
+    return write_x && write_y;
+}
