@@ -33,7 +33,7 @@ uint64_t client_state_view_angle_y_addr = -1;
 
 unsigned int glow_manager_so_offset = 0x29e8980;
 uint64_t glow_manager_ptr_addr = -1;
-uint64_t glow_manager_addr = 0;
+uint64_t glow_manager_addr = -1;
 unsigned int glow_object_offset = 0x40;
 unsigned int glow_object_count_addr_offset = 0x10;
 unsigned int glow_object_count = -1;
