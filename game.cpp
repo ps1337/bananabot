@@ -72,7 +72,7 @@ std::vector<float> Game::getPlayerLocation()
     return {result_x, result_y, result_z};
 }
 
-std::vector<float> Game::getEntityLocation(void *entity_base_addr)
+std::vector<float> Game::getEntityLocation(uint64_t entity_base_addr)
 {
     auto x = Mem::readFromAddr((void *)(entity_base_addr + entity_m_vec_origin_x_offset), sizeof(float));
     auto y = Mem::readFromAddr((void *)(entity_base_addr + entity_m_vec_origin_y_offset), sizeof(float));
@@ -125,7 +125,7 @@ std::vector<PlayerInfo_t> Game::getEnemies()
         // only if it's a player entity that's alive
         if (entity_team != own_team && entity_health > 0)
         {
-            auto location = Game::getEntityLocation((void *)addr);
+            auto location = Game::getEntityLocation(addr);
             PlayerInfo_t player_info(addr, entity_team, location, entity_health);
             res.push_back(player_info);
         }

@@ -46,7 +46,7 @@ class Game
 public:
     static bool getAddrs();
     static std::vector<float> getPlayerLocation();
-    static std::vector<float> getEntityLocation(void *entity_base_addr);
+    static std::vector<float> getEntityLocation(uint64_t entity_base_addr);
     static std::vector<PlayerInfo_t> getEnemies();
     static bool setAngle(float x, float y);
 };
