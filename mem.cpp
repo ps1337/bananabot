@@ -12,6 +12,7 @@ uint64_t Mem::getModuleStart(std::string module)
         std::cerr << "Error getting CSGO memory map" << std::endl;
         exit(1);
     }
+    // convert stirng to uint64_t
     std::stringstream ss;
     ss << std::hex << output.c_str();
     ss >> moduleStart;
@@ -66,7 +67,6 @@ bool Mem::writemem(void *address, void *buf, size_t size)
     return (bytes_count_write == (ssize_t)size);
 }
 
-
 uint64_t Mem::addr_from_ptr(uint64_t ptr)
 {
     unsigned char buffer[8];
@@ -75,6 +75,7 @@ uint64_t Mem::addr_from_ptr(uint64_t ptr)
         std::cerr << "Couldn't read from " << std::hex << ptr << std::endl;
         exit(1);
     }
+    // dereference where buffer points to
     ptr = *(uint64_t *)(&buffer);
     return ptr;
 }
@@ -82,6 +83,7 @@ uint64_t Mem::addr_from_ptr(uint64_t ptr)
 uint64_t Mem::addr_from_multilvl_ptr(uint64_t ptr, std::vector<unsigned int> offsets)
 {
     unsigned char buffer[8];
+    // loop through pointer levels
     for (int i = 0; i < offsets.size(); i++)
     {
         ptr += offsets[i];

@@ -2,6 +2,7 @@
 #include "mem.h"
 #include "game.h"
 #include "globalsettings.h"
+
 #include <iostream>
 #include <unistd.h>
 #include <string>
@@ -24,8 +25,9 @@ unsigned int client_state_so_offset = 0x00E20D08;
 unsigned int client_state_ptr_offset = 0x08;
 std::vector<unsigned int> client_state_offsets = {client_state_so_offset, client_state_ptr_offset};
 uint64_t client_state_addr = -1;
-unsigned int client_state_view_angle_x_offset = 0x8E98;
-unsigned int client_state_view_angle_y_offset = client_state_view_angle_x_offset + 0x04;
+// x and y coordinates are swapped in memory
+unsigned int client_state_view_angle_y_offset = 0x8E98;
+unsigned int client_state_view_angle_x_offset = client_state_view_angle_y_offset + 0x04;
 uint64_t client_state_view_angle_x_addr = -1;
 uint64_t client_state_view_angle_y_addr = -1;
 
@@ -60,6 +62,8 @@ unsigned int entity_m_vec_origin_z_offset = entity_m_vec_origin_start + 0x08;
 unsigned int entity_m_vec_origin_y_offset = entity_m_vec_origin_start;
 unsigned int entity_m_vec_origin_x_offset = entity_m_vec_origin_start + 0x04;
 
+// these values are calculated in every iteration of the main function
+// to always have correct values
 std::vector<float> own_location = {-1, -1, -1};
 PlayerInfo_t nearestEnemy(0, 0, {0}, 0);
 
@@ -75,7 +79,7 @@ int main()
     Game::getAddrs();
 
     bool bunnyhop = false;
-    bool noflash = false;
+    bool noflash = true;
     bool aimbot = true;
 
     while (true)
@@ -87,16 +91,20 @@ int main()
             auto enemies = Game::getEnemies();
             if (nearestEnemy.distance != 0.0)
             {
+                // calculate angle to aim at the nearest enemy
                 auto angle = MadMath::calcAngle(own_location, nearestEnemy.location);
                 //std::cout << "Aiming @ " << angle[1] << "/" << angle[0] << " (" << nearestEnemy.location[0] << "/" << nearestEnemy.location[1] << "/" << nearestEnemy.location[2] << ")" << std::endl;
                 //std::cout << "Own location: " << own_location[0] << "/" << own_location[1] << "/" << own_location[2] << std::endl << std::endl;
-                if(! (std::isnan(angle[0]) || std::isnan(angle[1]))) {
+                if (!(std::isnan(angle[0]) || std::isnan(angle[1])))
+                {
+                    // x and y are swapped in memory
                     if (!Game::setAngle(angle[1], angle[0]))
                     {
                         std::cerr << "Couldn't set angle to " << angle[1] << "/" << angle[0] << std::endl;
                     }
                 }
-                else {
+                else
+                {
                     std::cerr << "WARNING: Angle IsNAN" << std::endl;
                 }
             }
@@ -104,15 +112,17 @@ int main()
 
         if (bunnyhop && Mem::readFromAddr((void *)player_is_on_floor_addr, 1)[0] == 1)
         {
+            // 0x06 --> Jump for one frame and reset afterwards
             Mem::writeToAddr((void *)force_jump_addr, {0x06});
         }
 
         if (noflash)
         {
+            // overwrite remaining flash time and flash alpha value
             Mem::writeToAddr((void *)player_flash_time_addr, {0, 0, 0, 0, 0, 0, 0, 0});
         }
 
-        usleep(200);
+        usleep(150);
     }
 
     return 0;

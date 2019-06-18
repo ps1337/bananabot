@@ -20,6 +20,7 @@ std::string Util::exec(const char *cmd)
 
 pid_t Util::getPID()
 {
+    // enterprise ready
     std::string output = Util::exec("ps aux | grep steam | grep csgo | grep -v grep | awk '{print $2}'");
     if (output.length() == 0)
     {

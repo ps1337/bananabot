@@ -43,8 +43,6 @@ bool Game::getAddrs()
     glow_manager_addr = Mem::addr_from_multilvl_ptr(glow_manager_ptr_addr, {0, 0});
     std::cout << "glow_manager is @ " << std::hex << glow_manager_addr << std::endl;
 
-    auto tmp = Mem::readFromAddr((void *)(glow_manager_ptr_addr + glow_object_count_addr_offset), sizeof(int));
-
     return true;
 }
 
@@ -58,6 +56,7 @@ std::vector<float> Game::getPlayerLocation()
     float result_y = 0;
     float result_z = 0;
 
+    // convert bytes to float
     std::copy(reinterpret_cast<const char *>(&x[0]),
               reinterpret_cast<const char *>(&x[4]),
               reinterpret_cast<unsigned char *>(&result_x));
@@ -101,16 +100,15 @@ std::vector<float> Game::getEntityLocation(void *entity_base_addr)
 std::vector<PlayerInfo_t> Game::getEnemies()
 {
     std::vector<PlayerInfo_t> res;
+    // get amount of entities managed by the glow manager instance
     auto cnt_read = Mem::readFromAddr((void *)(glow_manager_ptr_addr + glow_object_count_addr_offset), sizeof(int));
-    // TODO value is cut
     int count = cnt_read[0];
 
-    //auto x = Game::getPlayerLocation();
-    //std::cout << "P: " << x[0] << " " << x[1] << " " << x[2] << std::endl;
-
+    // reset
     nearestEnemy.distance = 0.0;
     for (int i = 0; i < count; i++)
     {
+        // get the pointer to the current entity
         uint64_t ptr = glow_manager_addr + (glow_object_offset * i);
         uint64_t addr = Mem::addr_from_ptr(ptr);
         // empty entity slot
@@ -124,10 +122,10 @@ std::vector<PlayerInfo_t> Game::getEnemies()
 
         int own_team = Mem::readFromAddr((void *)(player_team_addr), sizeof(int))[0];
 
+        // only if it's a player entity that's alive
         if (entity_team != own_team && entity_health > 0)
         {
             auto location = Game::getEntityLocation((void *)addr);
-            //std::cout << "[*] " << addr << " " << entity_team << " " << entity_health << "  " << location[0] << ":" << location[1] << ":" << location[2] << std::endl;
             PlayerInfo_t player_info(addr, entity_team, location, entity_health);
             res.push_back(player_info);
         }
@@ -137,12 +135,13 @@ std::vector<PlayerInfo_t> Game::getEnemies()
 
 bool Game::setAngle(float x, float y)
 {
+    // convert floats to bytes
     std::vector<unsigned char> x_buf(sizeof(x));
     std::vector<unsigned char> y_buf(sizeof(y));
     std::memcpy(x_buf.data(), &x, sizeof(x));
     std::memcpy(y_buf.data(), &y, sizeof(y));
-    // TODO swapped
-    auto write_x = Mem::writeToAddr((void *)client_state_view_angle_x_addr, y_buf);
-    auto write_y = Mem::writeToAddr((void *)client_state_view_angle_y_addr, x_buf);
+    auto write_x = Mem::writeToAddr((void *)client_state_view_angle_x_addr, x_buf);
+    auto write_y = Mem::writeToAddr((void *)client_state_view_angle_y_addr, y_buf);
+
     return write_x && write_y;
 }

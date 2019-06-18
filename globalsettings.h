@@ -12,8 +12,6 @@ extern std::vector<float> own_location;
 struct PlayerInfo_t;
 extern PlayerInfo_t nearestEnemy;
 
-
-
 // Settings
 extern unsigned int player_base_so_offset;
 extern unsigned int player_base_ptr_offset;
