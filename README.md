@@ -15,7 +15,7 @@
 ## Building and Running
 
 ```
-<Edit the offsets in main.cpp according to your CS:GO version (e.g. with hazedumper)>
+<Edit the offsets in main.cpp according to your CS:GO version (e.g. with tuxdump)>
 mkdir build && cd build
 cmake .. && make
 sudo chown root:root ./build/bananabot
@@ -25,3 +25,8 @@ sudo ./build/bananabot
 ```
 
 The `chown` and `chmod` commands are used to "protect" the bot from Valve Anti Cheat (VAC).
+
+# References
+- [How To Make An Aimbot in C++](https://www.youtube.com/watch?v=RpnFoSIlw8s)
+- [Hazedumper](https://github.com/frk1/hazedumper/)
+- [PengWin](https://github.com/schroeji/pengWin/)
