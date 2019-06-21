@@ -26,6 +26,8 @@ sudo ./build/bananabot
 
 The `chown` and `chmod` commands are used to "protect" the bot from Valve Anti Cheat (VAC).
 
+A writeup can be found [here](https://ps1337.github.io/post/bananabot/).
+
 # References
 - [How To Make An Aimbot in C++](https://www.youtube.com/watch?v=RpnFoSIlw8s)
 - [Hazedumper](https://github.com/frk1/hazedumper/)
